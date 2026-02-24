@@ -3,10 +3,10 @@ import jwt from "jsonwebtoken";
 
 
 const welcometoDb = (req, res) => {
-    return res.send({
-        status: true,
-        messege: "Welcome to Node Js."
-    })
+  return res.send({
+    status: true,
+    messege: "Welcome to Node Js."
+  })
 }
 
 // Create or save user in DB
@@ -96,17 +96,17 @@ const logInUser = async (req, res) => {
     }
 
     // 401
-const decodePass = atob(isUserExist.password);
+    const decodePass = atob(isUserExist.password);
 
-if (decodePass !== password) {
-  return res.status(401).send({
-    status: false,
-    message: "Password is invalid",
-  });
-}
+    if (decodePass !== password) {
+      return res.status(401).send({
+        status: false,
+        message: "Password is invalid",
+      });
+    }
 
     // 200
-
+    
 
     // Generating token
     const token = jwt.sign(
@@ -135,32 +135,29 @@ if (decodePass !== password) {
 
 
 
-
-
-
 const fetchAllUser = async (req, res) => {
-    try {
-        const counts = await UserModal.countDocuments();
-        console.log(`counts ${counts}`)
+  try {
+    const counts = await UserModal.countDocuments();
+    console.log(`counts ${counts}`)
 
-        res.send({
-            status: true,
-            message: "Data Fetch Succssfuly",
-            data: counts
-        })
+    res.send({
+      status: true,
+      message: "Data Fetch Succssfuly",
+      data: counts
+    })
 
-        if (counts < 1) {
-            return res?.status(400).send({
-                status: false,
-                messege: "No User Found"
-            })
-        }
-
-    } catch (error) {
-
-        console.log(`Server Side Err ${error}`)
+    if (counts < 1) {
+      return res?.status(400).send({
+        status: false,
+        messege: "No User Found"
+      })
     }
-    
+
+  } catch (error) {
+
+    console.log(`Server Side Err ${error}`)
+  }
+
 }
 
 
