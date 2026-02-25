@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import connectedMongoDb from "./database/db.js";
 import router from "./Routes/UserRoutes/UserRoute.js";
 import cors from 'cors'
+import datarouter from "./Routes/UserRoutes/DataRouter.js";
 
 
 config({
@@ -20,6 +21,7 @@ connectedMongoDb();
 
 
 app.use("/user", router)
+app.use("/data", datarouter)
 
 
 app.listen(port, ()=>{

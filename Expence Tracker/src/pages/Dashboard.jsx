@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import TopCard from '../components/TopCard'
+import AllFetch from '../components/AllFetch'
 
 function Dashboard() {
 
@@ -13,6 +14,8 @@ function Dashboard() {
       <div className="">
         <TopCard />
 
+
+<AllFetch />
         
       </div>
 

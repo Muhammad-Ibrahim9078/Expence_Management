@@ -2,163 +2,166 @@ import UserModal from "../../Model/UserModel.js";
 import jwt from "jsonwebtoken";
 
 
+//  Welcome Route
 const welcometoDb = (req, res) => {
-  return res.send({
+  return res.status(200).send({
     status: true,
-    messege: "Welcome to Node Js."
-  })
-}
+    message: "Welcome to Node Js.",
+  });
+};
 
-// Create or save user in DB
+
+//  CREATE USER (SIGNUP)
 const createUser = async (req, res) => {
-  console.log(`Body: ${JSON.stringify(req.body)}`);
-
   try {
-    // 400:
-    const bodyValues = Object.values(req.body);
-    const isValidate = bodyValues?.some((item) => {
-      return item == "";
-    });
+    const { userName, email, password } = req.body;
+    
 
-    if (isValidate) {
+    //  Validation
+    if (!userName || !email || !password) {
       return res.status(400).send({
         status: false,
         message: "All fields are required",
       });
     }
 
-    // 404
-    const isUserExist = await UserModal.findOne({ email: req?.body?.email });
+    //  Check if user already exists
+    const isUserExist = await UserModal.findOne({ email });
+
     if (isUserExist) {
-      return res.status(404).send({
+      return res.status(409).send({
         status: false,
-        message: "User with this email already exist",
+        message: "User with this email already exists",
       });
     }
 
-    // 200:
-    // Low elevel security...!
-    const hashPass = btoa(req?.body?.password);
-    const obj = { ...req?.body };
-    obj.password = hashPass;
+    //  Simple encoding (for now - later use bcrypt)
+    const hashPass = Buffer.from(password).toString("base64");
 
-    const newUser = new UserModal(obj);
-    const saveUser = await newUser.save();
+    const newUser = new UserModal({
+      userName,
+      email,
+      password: hashPass,
+    });
 
-    if (saveUser) {
-      return res.status(200).send({
-        status: true,
-        message: "User saved successfully",
-        data: newUser,
-      });
-    }
+    const savedUser = await newUser.save();
+
+    return res.status(201).send({
+      status: true,
+      message: "User created successfully",
+      data: savedUser,
+    });
   } catch (error) {
-    // 500:
-    console.log("Err from server side: ", error);
+    console.log("Server Error (Create User): ", error);
 
     return res.status(500).send({
       status: false,
-      message: "Err from server side",
-      serverErrMsg: error,
+      message: "Server error",
+      error: error.message,
     });
   }
-
-
 };
 
 
-
-
-
-
-// Login user api controller...!
+//  LOGIN USER (FIXED JWT VERSION)
 
 const logInUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
 
-    // 400
+    // 🔹 Validation
     if (!email || !password) {
-      return res?.status(400).send({
+      return res.status(400).send({
         status: false,
-        message: "Email and password required",
+        message: "Email and password are required",
       });
     }
 
-    // 404:
+    //  Find user
     const isUserExist = await UserModal.findOne({ email });
+
     if (!isUserExist) {
-      return res?.status(404).send({
+      return res.status(404).send({
         status: false,
         message: "User not found",
       });
     }
 
-    // 401
-    const decodePass = atob(isUserExist.password);
+    //  Decode password
+    const decodedPass = Buffer.from(
+      isUserExist.password,
+      "base64"
+    ).toString("utf-8");
 
-    if (decodePass !== password) {
+    //  Check password
+    if (decodedPass !== password) {
       return res.status(401).send({
         status: false,
-        message: "Password is invalid",
+        message: "Invalid password",
       });
     }
 
-    // 200
-    
-
-    // Generating token
+    //  GENERATE CORRECT JWT TOKEN (VERY IMPORTANT)
     const token = jwt.sign(
       {
-        userName: isUserExist?.userName,
-        uid: isUserExist?._id + new Date().getTime(),
+        id: isUserExist._id, // 👈 MUST BE id (for middleware)
+        userName: isUserExist.userName,
+        email: isUserExist.email,
       },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" },
+      {
+        expiresIn: "1h",
+      }
     );
 
-    return res?.status(200).send({
+    return res.status(200).send({
       status: true,
-      message: "Log In Success",
-      data: isUserExist,
+      message: "Login successful",
       token: token,
+      user: {
+        _id: isUserExist._id,
+        userName: isUserExist.userName,
+        email: isUserExist.email,
+      },
     });
   } catch (error) {
-    console.log("Server err in login api: ", error);
-    return res?.status(500).send({
+    console.log("Server Error (Login): ", error);
+
+    return res.status(500).send({
       status: false,
       message: "Internal server error",
+      error: error.message,
     });
   }
 };
 
-
+//  FETCH ALL USERS COUNT
 
 const fetchAllUser = async (req, res) => {
   try {
     const counts = await UserModal.countDocuments();
-    console.log(`counts ${counts}`)
-
-    res.send({
-      status: true,
-      message: "Data Fetch Succssfuly",
-      data: counts
-    })
 
     if (counts < 1) {
-      return res?.status(400).send({
+      return res.status(404).send({
         status: false,
-        messege: "No User Found"
-      })
+        message: "No users found",
+      });
     }
 
+    return res.status(200).send({
+      status: true,
+      message: "Users fetched successfully",
+      totalUsers: counts,
+    });
   } catch (error) {
+    console.log("Server Error (Fetch Users): ", error);
 
-    console.log(`Server Side Err ${error}`)
+    return res.status(500).send({
+      status: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
-
-}
-
+};
 
 export { welcometoDb, createUser, logInUser, fetchAllUser };

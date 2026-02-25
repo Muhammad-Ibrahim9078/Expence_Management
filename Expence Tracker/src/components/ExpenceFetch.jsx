@@ -1,65 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaShoppingCart } from "react-icons/fa";
 
-export default function ExpenseFetch() {
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ExpenseFetch = () => {
+  const [expenseData, setExpenseData] = useState([]);
 
-  // Fetch expenses
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/user/api/transaction/all", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        // Sirf expense wale filter karo
-        const expenseData = response.data.data.transactions.filter(t => t.type === "expense");
-        setExpenses(expenseData);
-        
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExpenses();
+    axios.get("http://localhost:5000/data/all")
+      .then(res => {
+        if (res.data.status) {
+          const expenses = res.data.data.filter(item => item.type === "expense");
+          setExpenseData(expenses);
+        }
+      })
+      .catch(err => console.log(err));
   }, []);
 
-  // Loading state
-  if (loading) {
-    return <div className="text-center p-4">Loading expenses...</div>;
-  }
-
-  // Simple List Display
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">My Expenses</h2>
-      
-      {expenses.length === 0 ? (
-        <p className="text-gray-500">No expenses found</p>
-      ) : (
-        <div className="space-y-2">
-          {expenses.map((expense) => (
-            <div 
-              key={expense._id}
-              className="flex items-center justify-between p-3 bg-white rounded-lg shadow"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{expense.emoi || '💸'}</span>
-                <div>
-                  <p className="font-medium">₹{expense.amount}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(expense.date).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3 flex items-center">
+        <FaShoppingCart className="mr-3 text-red-500"/> Expense List
+        <span className="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">
+          {expenseData.length} items
+        </span>
+      </h2>
+      <ul className="space-y-3">
+        {expenseData.map(item => (
+          <li key={item._id} className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-red-500 flex justify-between items-center">
+            <span className="font-medium text-gray-700">{item.title}</span>
+            <span className="bg-red-50 text-red-600 font-bold px-4 py-1 rounded-full">
+              -${item.amount}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default ExpenseFetch;
