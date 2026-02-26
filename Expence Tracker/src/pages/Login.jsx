@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { BiUserCircle } from 'react-icons/bi';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -41,8 +42,15 @@ function Login() {
             .then((response) => {
                 console.log("Login Successful:", response.data);
                 localStorage.setItem('token', response.data.token);
-                
-                navigate('/'); // react-router-dom use karke
+                Swal.fire({
+                    title: "Successfully Login..",
+                    icon: "success",
+                    draggable: true
+                }).then(()=>{
+
+                    navigate('/'); // react-router-dom use karke
+                })
+
             })
             .catch((error) => {
                 console.log("Login Failed:", error.response?.data || error.message);

@@ -5,6 +5,8 @@ import { MdAttachMoney } from 'react-icons/md';
 import { FiBriefcase } from 'react-icons/fi';
 import EmojiPicker from 'emoji-picker-react';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 function AddExpence({ closeModal }) {
   const [selectedEmoji, setSelectedEmoji] = useState('💰');
@@ -34,8 +36,8 @@ function AddExpence({ closeModal }) {
       });
 
       console.log('Response:', res.data);
-      alert('Expense added successfully!');
-      closeModal(); // close modal after success
+      // closeModal(); // close modal after success
+      toast('Here is your toast.');
     } catch (error) {
       console.error('Error adding expense:', error);
       alert('Something went wrong!');

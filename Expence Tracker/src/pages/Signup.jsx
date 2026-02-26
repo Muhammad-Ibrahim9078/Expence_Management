@@ -7,7 +7,7 @@ import axios from 'axios';
 function Signup() {
     const [showPassword, setShowPassword] = useState(false);
     let navigate = useNavigate();
-    
+
     // State for form data - username, email aur password ke liye
     const [formData, setFormData] = useState({
         username: '',
@@ -28,30 +28,30 @@ function Signup() {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form Data:', formData);
-        
-       axios({
-        method: "post",
-        url: "http://localhost:5000/user/create",
-        data: {
-            userName: formData.username,
-            email: formData.email,
-            password: formData.password,
-        },
-    })
-    .then((response) => {
-        console.log("Login Successful:", response.data);
-        navigate('/login'); // react-router-dom use karke
-    })
-    .catch((error) => {
-        console.log("Login Failed:", error.response?.data || error.message);
-        // Yahan error message show kar sakte ho user ko
-    });
+
+        axios({
+            method: "post",
+            url: "http://localhost:5000/user/create",
+            data: {
+                userName: formData.username,
+                email: formData.email,
+                password: formData.password,
+            },
+        })
+            .then((response) => {
+                console.log("Login Successful:", response.data);
+                navigate('/login'); // react-router-dom use karke
+            })
+            .catch((error) => {
+                console.log("Login Failed:", error.response?.data || error.message);
+                // Yahan error message show kar sakte ho user ko
+            });
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full flex flex-col md:flex-row">
-                
+
                 {/* Left Side - Signup Form */}
                 <div className="w-full md:w-1/2 p-8 lg:p-12">
                     <div className="flex items-center gap-2 mb-8">
@@ -72,8 +72,8 @@ function Signup() {
                                 Username
                             </label>
                             <div className="relative">
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     name="username"
                                     value={formData.username}
                                     onChange={handleInputChange}
@@ -91,8 +91,8 @@ function Signup() {
                                 Email Address
                             </label>
                             <div className="relative">
-                                <input 
-                                    type="email" 
+                                <input
+                                    type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
@@ -110,7 +110,7 @@ function Signup() {
                                 Password
                             </label>
                             <div className="relative">
-                                <input 
+                                <input
                                     type={showPassword ? "text" : "password"}
                                     name="password"
                                     value={formData.password}
@@ -120,7 +120,7 @@ function Signup() {
                                     required
                                     minLength="8"
                                 />
-                                <button 
+                                <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
@@ -131,7 +131,7 @@ function Signup() {
                         </div>
 
                         {/* Submit Button */}
-                        <button 
+                        <button
                             type="submit"
                             className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold text-lg hover:from-blue-600 hover:to-indigo-700 transition-all transform hover:scale-[1.02] shadow-md hover:shadow-lg mt-2"
                         >
@@ -151,8 +151,8 @@ function Signup() {
                 {/* Right Side - Image/Poster */}
                 <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-700 p-12">
                     <div className="h-full flex flex-col items-center justify-center text-white">
-                        <img 
-                            src="https://www.mylifemytao.com/wp-content/uploads/2020/07/Screenshot-2020-01-08-12.02.39-1024x745.png" 
+                        <img
+                            src="https://www.mylifemytao.com/wp-content/uploads/2020/07/Screenshot-2020-01-08-12.02.39-1024x745.png"
                             alt="Expense Tracker Poster"
                             className="w-full max-w-md mb-8 drop-shadow-2xl"
                         />
